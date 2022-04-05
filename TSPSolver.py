@@ -92,10 +92,9 @@ def tryDifferentRoutes(current_solution, route):
              #   print("Our possible solution costs " + str(possible_solution.cost))
               #  print("Our old solution had a route cost of " + str(current_solution['cost']))
             if best_solution['cost'] > possible_solution.cost:
-                    best_solution['cost'] = deepcopy(possible_solution.cost)
-                    best_solution['soln'] = deepcopy(possible_solution.route)
+                   best_solution['cost'] = deepcopy(possible_solution.cost)
+                   best_solution['soln'] = deepcopy(possible_solution.route)
             route_copy[i], route_copy[j] = route_copy[j], route_copy[i]
-
 
 
                # better_solutions.append(possible_solution)
@@ -163,7 +162,7 @@ class TSPSolver:
 		algorithm</returns>
 	'''
 
-    def greedy(self, time_allowance=60.0, starting_column = 0):
+    def greedy(self, time_allowance=60.0, starting_column = 6):
         cities = self._scenario.getCities()
         ncities = len(cities)
         start_time = time.time()
@@ -189,6 +188,15 @@ class TSPSolver:
         city_path =[]
         results = {}
         for i in range(len(path) - 1):
+            if(path[i] == -1):
+                results['cost'] = np.inf
+                results['time'] = time.time() - start_time
+                results['count'] = None
+                results['soln'] = None
+                results['max'] = None
+                results['total'] = None
+                results['pruned'] = None
+                return results
             city_path.append(cities[path[i]])
         route = TSPSolution(city_path)
         end_time = time.time()
@@ -347,8 +355,11 @@ class TSPSolver:
             elif possible_solution['cost'] < third_smallest['cost']:
                 third_smallest = possible_solution
         route = smallest_solution['soln'].route
+        small_copy = deepcopy(smallest_solution)
         route_list = tryDifferentRoutes(smallest_solution, route)
         print("Our smallest solution is " + str(smallest_solution['cost']))
+
+        print(smallest_solution['soln'].route[0]._index)
         while len(route_list) > 0:
             attempt_route = route_list.pop()
             other_solution = smallest_solution
@@ -369,7 +380,8 @@ class TSPSolver:
         smallest_solution['time'] = end_time - start_time
 
         print(smallest_solution['soln'])
-        smallest_solution['soln'] = TSPSolution(smallest_solution['soln'])
+        if type(smallest_solution['soln']) != TSPSolution:
+            smallest_solution['soln'] = TSPSolution(smallest_solution['soln'])
         return smallest_solution
 
         pass
